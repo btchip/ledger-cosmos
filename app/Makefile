@@ -61,6 +61,7 @@ ifeq ($(COIN),ATOM)
 # Main app configuration
 APPNAME = "Cosmos"
 APPPATH = "44'/118'"
+APPPATH2 = "44'/60'"
 else
 define error_message
 
@@ -72,13 +73,15 @@ endef
 $(error "$(error_message)")
 endif
 
-APP_LOAD_PARAMS = --appFlags 0x200 --delete $(COMMON_LOAD_PARAMS) --path $(APPPATH)
+APP_LOAD_PARAMS = --appFlags 0x200 --delete $(COMMON_LOAD_PARAMS) --path $(APPPATH) --path $(APPPATH2)
 
 ifeq ($(TARGET_NAME),TARGET_NANOS)
 APP_STACK_SIZE:=1444
 ICONNAME:=$(CURDIR)/nanos_icon.gif
 OUTPUT_ELF ?= $(CURDIR)/output/app_s.elf
 OUTPUT_INSTALLER := $(CURDIR)/pkg/installer_s.sh
+DEFINES += USE_CXRAM_SECTION
+SCRIPT_LD:=$(CURDIR)/script-nanos.ld
 endif
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
@@ -176,6 +179,9 @@ LDLIBS   += -lm -lgcc -lc
 ##########################
 GLYPH_SRC_DIR = glyphs
 INCLUDES_PATH += $(MY_DIR)/glyphs
+# Needed to be able to include the definition of G_cx
+INCLUDES_PATH += $(BOLOS_SDK)/lib_cxng/src
+
 include $(BOLOS_SDK)/Makefile.glyphs
 
 APP_SOURCE_PATH += $(MY_DIR)/src
